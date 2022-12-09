@@ -12,6 +12,7 @@ import YourName from "./images/Your-name.png";
 import TeamName from "./images/Your-Team-Name.png";
 import Logo from"./images/Logo.png"
 import EnterName from "./images/Enter-Pokemon-Name.png"
+import Link from "./images/link.png"
 
 
 function App() {
@@ -38,7 +39,6 @@ function App() {
       const response = await axios.get("/api/teams/" + owner + "/" + teamName);
       let result_team = response.data.team;
       let result_message = response.data.message;
-      debugger;
       if(result_message !== undefined){
         setTeamMessage(result_message);
         console.log(teamMessage);
@@ -75,18 +75,18 @@ function App() {
   }
   
   const createPokemon = async() => {
-    debugger;
+  
     try{
-      const response = await axios.post("api/teams/addpokemon/", {name: pokeName, img: pokeImg, description:pokeDescription, level: pokeLevel});
+      const response = await axios.post("/api/teams/addpokemon/", {name: pokeName, img: pokeImg, description:pokeDescription, level: pokeLevel});
     }catch(error){
       setError("Error adding pokemon")
     }
   }
     
   const addPokemontoTeam = async() => {
-    debugger;
+  
     try{
-      const response = await axios.put("api/teams/addToTeam", {owner: owner, teamName: teamName, img: pokeImg});
+      const response = await axios.put("/api/teams/addToTeam", {owner: owner, teamName: teamName, img: pokeImg});
     }catch(error){
       setError("Error adding pokemon")
     }
@@ -144,12 +144,13 @@ function App() {
         }
     
     const addPokemon = async() => {
+      setShowSearch(false);
       await createPokemon();
       await addPokemontoTeam();
-
     }
     
     const getTeam = async() => {
+    setPokeImg(Empty);
     console.log(owner);
     console.log(teamName);
     await fetchTeam();
@@ -165,12 +166,24 @@ function App() {
   
   
   
-  const createSearch = () => {
+  const createSearch = async() => {
     setShowSearch(true);
     console.log(showSearch);
   }
   
+  const deleteSquad = async() => {
+    debugger;
+    try{
+      const response = await axios.delete("/api/teams/delete/" + owner  + "/" + teamName);
+    }catch(error){
+      setError("Error adding pokemon")
+    }
+  } 
   
+  const deleteTeam = async() => {
+    setShowSquad(false);
+    await deleteSquad();
+  }
   
   function Search(props){
     return (
@@ -197,9 +210,16 @@ function App() {
   function Team(props){
     return(
         <div className="squad">
+        <h1 className="squad_caption">{teamMessage}</h1>
+        <h1>CLICK ON THE + BUTTON TO ADD A POKEMON</h1>
+        <div>
+        <h1>OR CLICK ON THE CARD TO CHANGE IT</h1>
+        </div>
       <div className="board-row">
       <Slot/>
       </div>
+      <h1>If you want to Delete Your team Click Here</h1>
+      <button onClick={e => deleteTeam()}>DELETE</button>
     </div>
       )
   }
@@ -214,6 +234,11 @@ function App() {
       <img clasName="description" src={Description}/>
       <div>
       <label>
+      <div>
+      <a href="https://github.com/davizacheu/Project4">
+      <img src={Link}/>
+      </a>
+      </div>
         <img src={YourName}/>
         <input type="text" value={owner} onChange={e => setOwner(e.target.value)} />
       </label>
@@ -226,7 +251,6 @@ function App() {
       <button onClick={e => getTeam()}>GET TEAM</button>
       <button onClick={e => createTeam()}>CREATE TEAM</button>
       </div>
-    <h1 className="squad_caption">{teamMessage}</h1>
     {showAddButton &&
     <button onClick={e => addPokemon()}>ADD POKEMON</button>
     }

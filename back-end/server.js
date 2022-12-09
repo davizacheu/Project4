@@ -19,7 +19,6 @@ mongoose.connect('mongodb://localhost:27017/pokemon', {
 const pokemonSchema = new mongoose.Schema({
   name: String,
   img: String,
-  description: String,
   level: String,
 });
 
@@ -101,14 +100,16 @@ app.post('/api/teams/addteam/:owner/:name', async (req, res) => {
   }
 });
 
-app.post('api/teams/addpokemon', async (req, res) => {
+app.post('/api/teams/addpokemon', async (req, res) => {
   console.log("In addpokemon");
   
-  console.log(req.bod)
+  console.log(req.body.name);
+  console.log(req.body.img);
+  console.log(req.body.description);
+  console.log(req.body.level);
   let new_pokemon = new Pokemon({
     name: req.body.name,
     img:req.body.img,
-    description: req.body.description,
     level: req.body.level
   });
     try {
@@ -121,20 +122,42 @@ app.post('api/teams/addpokemon', async (req, res) => {
 });
 
 
-app.put('api/teams/addToTeam', async (req, res) => {
+app.put('/api/teams/addToTeam', async (req, res) => {
   console.log("In add to team");
+  console.log(req.body.owner);
+  console.log(req.body.teamName);
+  const passed_owner = req.body.owner;
+  const passed_name = req.body.teamName;
   try {
     let team = await Squad.findOne({
         owner: req.body.owner,
-        name: req.body.name
+        name: req.body.teamName
     });
+    console.log(team);
     team.squad = req.body.img;
+    console.log(team);
     await team.save();
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
   }
-})
+});
+
+app.delete('/api/teams/delete/:owner/:name', async (req,res) => {
+  console.log("In delete squad");
+  console.log(req.params.owner);
+  console.log(req.params.name);
+  try{
+    await Squad.deleteOne({
+      owner:req.body.owner,
+      name:req.body.name
+    });
+    res.sendStatus(200);
+  }catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+});
 
 
 
