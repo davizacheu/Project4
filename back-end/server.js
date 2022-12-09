@@ -26,7 +26,7 @@ const pokemonSchema = new mongoose.Schema({
 const squadSchema = new mongoose.Schema({
     owner: String,
     name: String,
-    squad:[String],
+    squad: String,
 });
 
 pokemonSchema.virtual('id')
@@ -102,6 +102,40 @@ app.post('/api/teams/addteam/:owner/:name', async (req, res) => {
   }
 });
 
+app.post('api/teams/addpokemon', async (req, res) => {
+  console.log("In addpokemon");
+  
+  console.log(req.bod)
+  let new_pokemon = new Pokemon({
+    name: req.body.name,
+    img:req.body.img,
+    description: req.body.description,
+    level: req.body.level
+  });
+    try {
+    await new_pokemon.save();
+    res.send({pokemon: new_pokemon});
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+});
+
+
+app.put('api/teams/addToTeam', async (req, res) => {
+  console.log("In add to team");
+  try {
+    let team = await Squad.findOne({
+        owner: req.body.owner,
+        name: req.body.name
+    });
+    team.squad = req.body.img;
+    await team.save();
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+})
 
 
 

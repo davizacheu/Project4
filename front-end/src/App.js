@@ -30,20 +30,23 @@ function App() {
   const [pokeImg, setPokeImg] = useState(Empty);
   const [pokeDescription, setPokeDescription] = useState('');
   const [pokeLevel, setPokeLevel] = useState('');
+  const [showAddButton, setShowAddButton] = useState(false);
   
   
   const fetchTeam = async() => {
     try{
-      // debugger;
       const response = await axios.get("/api/teams/" + owner + "/" + teamName);
       let result_team = response.data.team;
       let result_message = response.data.message;
+      debugger;
       if(result_message !== undefined){
         setTeamMessage(result_message);
         console.log(teamMessage);
       }
       else{
-        setTeam(result_team);
+        if(result_team.squad !== undefined){
+          setPokeImg(result_team.squad);
+        }
         setTeamMessage("Your Team: " + result_team.owner + " " + result_team.name);
         setShowSquad(true);
       }
@@ -71,10 +74,26 @@ function App() {
     }
   }
   
-  const getPokemon = async() => {
-        debugger;
+  const createPokemon = async() => {
+    debugger;
+    try{
+      const response = await axios.post("api/teams/addpokemon/", {name: pokeName, img: pokeImg, description:pokeDescription, level: pokeLevel});
+    }catch(error){
+      setError("Error adding pokemon")
+    }
+  }
+    
+  const addPokemontoTeam = async() => {
+    debugger;
+    try{
+      const response = await axios.put("api/teams/addToTeam", {owner: owner, teamName: teamName, img: pokeImg});
+    }catch(error){
+      setError("Error adding pokemon")
+    }
+  }
+  
+  const getPokemon = () => {
         let value = pokeName;
-        console.log(value);
         
         function capitalizeFirstLetter(str) {
             return (str.charAt(0).toUpperCase() + str.slice(1));
@@ -84,7 +103,6 @@ function App() {
         if (value === ""){
            return; 
         }
-        console.log(finalvalue);
         
         fetch('https://api.pokemontcg.io/v2/cards?q=name:'+finalvalue) 
         .then((res) => res.json())
@@ -101,24 +119,58 @@ function App() {
             let card = target.images.large;
             let name = target.name;
             let description = target.description;
-            let level = target.
+            let level = target.level;
             console.log(card);
-            setPokeImg( {img: card}) ;
+            setPokeImg(card);
             setPokeDescription(target.description);
             setPokeName(target.name);
             setPokeLevel(target.level);
-            setShowSearchRes(true);
+            setShowAddButton(true);
+            console.log(pokeImg);
+            console.log(pokeDescription);
+            console.log(pokeName);
+            console.log(pokeLevel);
+            
         });
-        
-        console.log(pokeImg);
-        console.log(pokeDescription);
-        console.log(pokeName);
-        console.log(pokeLevel);
     }
     
+    const searchPokemon = async() => {
+      debugger;
+          await getPokemon();
+          console.log(pokeImg);
+            console.log(pokeDescription);
+            console.log(pokeName);
+            console.log(pokeLevel);
+        }
+    
     const addPokemon = async() => {
-      
+      await createPokemon();
+      await addPokemontoTeam();
+
     }
+    
+    const getTeam = async() => {
+    console.log(owner);
+    console.log(teamName);
+    await fetchTeam();
+    console.log(team);
+    console.log(teamMessage);
+  }
+  
+  
+  const createTeam = async() => {
+    await addTeam();
+  }
+  
+  
+  
+  
+  const createSearch = () => {
+    setShowSearch(true);
+    console.log(showSearch);
+  }
+  
+  
   
   function Search(props){
     return (
@@ -128,7 +180,7 @@ function App() {
                         <label>
                         <input type="text" value={pokeName} onChange={e => setPokeName(e.target.value)} />
                         </label>
-                        <input id="pokemonButton" type="submit" onClick={e => getPokemon()}></input>
+                        <input id="pokemonButton" type="submit" onClick={e => searchPokemon()}></input>
                 <PokemonResults show={showSearchRes} card={pokeImg} onClick={e=> addPokemon()}></PokemonResults>
             </div>
       )
@@ -152,26 +204,6 @@ function App() {
       )
   }
   
-  const getTeam = async() => {
-    console.log(owner);
-    console.log(teamName);
-    await fetchTeam();
-    console.log(team);
-    console.log(teamMessage);
-  }
-  
-  const createTeam = async() => {
-    await addTeam();
-    
-  }
-  
-  
-  
-  
-  const createSearch = () => {
-    setShowSearch(true);
-    console.log(showSearch);
-  }
   
   return (
     <div className="App">
@@ -193,6 +225,9 @@ function App() {
       <button onClick={e => createTeam()}>CREATE TEAM</button>
       </div>
     <h1 className="squad_caption">{teamMessage}</h1>
+    {showAddButton &&
+    <button onClick={e => addPokemon()}>ADD POKEMON</button>
+    }
     {showSquad &&
       <Team/>
     }

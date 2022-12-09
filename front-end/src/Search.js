@@ -19,6 +19,7 @@ class Search extends Component {
 
         this.getPokemon = this.getPokemon.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        
     }
 
     getPokemon(event) {
