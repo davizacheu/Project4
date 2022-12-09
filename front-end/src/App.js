@@ -208,7 +208,9 @@ function App() {
   return (
     <div className="App">
     {error}
+    <div>
       <img clasName="welcome_logo" src={WelcomeLogo}/>
+      </div>
       <img clasName="description" src={Description}/>
       <div>
       <label>

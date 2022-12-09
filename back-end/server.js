@@ -81,7 +81,6 @@ app.post('/api/teams/addteam/:owner/:name', async (req, res) => {
   const new_team = new Squad({
     owner: passed_owner,
     name: passed_name,
-    squad:[]
   });
   try {
     let found = await Squad.findOne({
