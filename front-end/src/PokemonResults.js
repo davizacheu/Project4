@@ -4,8 +4,8 @@ function PokemonResults(props){
     }
     else{
         return <div>
+        <button onClick={props.addPoke}>Add Pokemon To Your Team</button>
         <img class= "card" src={props.card}></img>
-        <button>Add Pokemon To Your Team</button>
         </div>;
     }
 }
